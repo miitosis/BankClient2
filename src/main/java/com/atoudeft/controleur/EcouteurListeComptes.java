@@ -19,8 +19,32 @@ public class EcouteurListeComptes extends MouseAdapter {
         this.client = client;
     }
 
+    public static int index;
+    public static String[] tableauString;
+
     @Override
     public void mouseClicked(MouseEvent evt) {
-        //à compléter
+        if (evt.getClickCount() == 2) {
+            JList<String> liste = (JList<String>) evt.getSource();
+
+            String compteSelectionne = liste.getSelectedValue();
+
+            index = liste.getSelectedIndex();
+            tableauString = new String[liste.getModel().getSize()];
+
+            for (int i = 0; i < liste.getModel().getSize(); i++) {
+                tableauString[i] = liste.getModel().getElementAt(i);
+            }
+
+
+
+            compteSelectionne = compteSelectionne.substring(compteSelectionne.indexOf("[") + 1);
+            compteSelectionne = compteSelectionne.substring(0,compteSelectionne.indexOf("]"));
+            compteSelectionne = compteSelectionne.toLowerCase();
+
+            if (compteSelectionne != null) {
+                client.envoyer("SELECT " + compteSelectionne);
+            }
+        }
     }
 }

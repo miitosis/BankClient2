@@ -50,7 +50,6 @@ public class EcouteurMenuPrincipal implements ActionListener {
                     }
                     break;
                 case "CONFIGURER":
-                    // Compléter la configuration du serveur
                     configurerServeur();
                     break;
                 case "QUITTER":

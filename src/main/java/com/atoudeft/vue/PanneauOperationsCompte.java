@@ -8,6 +8,10 @@ public class PanneauOperationsCompte extends JPanel {
     private JButton bEpargne, bDepot, bRetrait, bTransfert, bFacture, bHistorique;
     private JLabel lblSolde;
 
+    public void setLblSolde(String solde){
+        lblSolde.setText(solde);
+    }
+
     public PanneauOperationsCompte() {
         bEpargne = new JButton("Créer compte épargne");
         bDepot = new JButton("Déposer");

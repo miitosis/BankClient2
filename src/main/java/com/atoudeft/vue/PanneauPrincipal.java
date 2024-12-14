@@ -3,6 +3,7 @@ package com.atoudeft.vue;
 import com.atoudeft.client.Client;
 import com.atoudeft.controleur.EcouteurConnexion;
 import com.atoudeft.controleur.EcouteurListeComptes;
+import com.atoudeft.controleur.EcouteurOperationsCompte;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +36,8 @@ public class PanneauPrincipal  extends JPanel {
         panneauConnexion.setEcouteur(new EcouteurConnexion(client,panneauConnexion));
 
         panneauOperationsCompte = new PanneauOperationsCompte();
+        EcouteurOperationsCompte ecouteurOperationsCompte = new EcouteurOperationsCompte(client);
+        panneauOperationsCompte.setEcouteur(ecouteurOperationsCompte);
 
         panneauCompteClient = new JPanel();
 
@@ -60,6 +63,10 @@ public class PanneauPrincipal  extends JPanel {
         this.add(panneauConnexion, BorderLayout.NORTH);
         this.add(panneauCompteClient, BorderLayout.CENTER);
         panneauCompteClient.setVisible(false);
+    }
+
+    public PanneauOperationsCompte getPanneauOperationsCompte(){
+        return panneauOperationsCompte;
     }
 
     /**
@@ -91,4 +98,13 @@ public class PanneauPrincipal  extends JPanel {
     public void ajouterCompte(String str) {
         numerosComptes.addElement(str);
     }
+
+    public JList<String> getListeNumeroCompte() {
+        return this.jlNumerosComptes;
+    }
+
+    public DefaultListModel<String> getNumerosComptes(){
+        return this.numerosComptes;
+    }
+
 }

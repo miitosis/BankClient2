@@ -3,6 +3,7 @@ package com.atoudeft.client;
 import com.atoudeft.commun.evenement.Evenement;
 import com.atoudeft.commun.evenement.GestionnaireEvenement;
 import com.atoudeft.commun.net.Connexion;
+import com.atoudeft.vue.PanneauHistorique;
 import com.atoudeft.vue.PanneauPrincipal;
 import com.programmes.MainFrame;
 
@@ -41,12 +42,17 @@ public class GestionnaireEvenementClient2 implements GestionnaireEvenement {
                     client.deconnecter(); //On ferme la connexion
                     break;
                 /******************* CREATION et CONNEXION *******************/
-//                case "HIST": //Le serveur a renvoyé
-//                    panneauPrincipal.setVisible(true);
-//                    JOptionPane.showMessageDialog(null,"Panneau visible");
-//                    cnx.envoyer("LIST");
-//                    arg = evenement.getArgument();
-//                    break;
+                case "HIST": //Le serveur a renvoyé
+                    arg = evenement.getArgument();
+                    if (arg.length() > 3) {
+                        str = arg.substring(arg.indexOf("OK") + 2).trim();
+                        System.out.print(str);
+                        t = str.split("\n");
+                        gererHistorique(t);
+                    } else {
+                        gererHistorique(new String[0]);
+                    }
+                    break;
                 case "OK":
                     panneauPrincipal.setVisible(true);
                     fenetre = (MainFrame)panneauPrincipal.getTopLevelAncestor();
@@ -82,29 +88,66 @@ public class GestionnaireEvenementClient2 implements GestionnaireEvenement {
                 /******************* SÉLECTION DE COMPTES *******************/
                 case "EPARGNE" :
                     arg = evenement.getArgument();
-                    JOptionPane.showMessageDialog(panneauPrincipal,"EPARGNE "+arg);
+                    if (arg.trim().startsWith("NO")) {
+                        JOptionPane.showMessageDialog(panneauPrincipal,"Erreur lors de la création du compte épargne !");
+                    }
+                    else {
+                        str = arg.substring(arg.indexOf("OK")+2).trim();
+                        panneauPrincipal.ajouterCompte(str);
+                    }
                     break;
                 case "SELECT" :
                     arg = evenement.getArgument();
-                    JOptionPane.showMessageDialog(panneauPrincipal,"SELECT "+arg);
+                    if (arg.trim().startsWith("NO")) {
+                        JOptionPane.showMessageDialog(panneauPrincipal,"Erreur lors de la sélection du compte");
+                    }else {
+                        str = arg.substring(arg.indexOf("OK")+2).trim();
+                        t = str.split(" ");
+                        panneauPrincipal.getPanneauOperationsCompte().setLblSolde("Solde: " + t[1]);
+                    }
                     break;
 
                 /******************* OPÉRATIONS BANCAIRES *******************/
                 case "DEPOT" :
                     arg = evenement.getArgument();
-                    JOptionPane.showMessageDialog(panneauPrincipal,"DEPOT "+arg);
+                    if (arg.trim().startsWith("NO")) {
+                        JOptionPane.showMessageDialog(panneauPrincipal,"Erreur de depot");
+                    }
+                    else {
+                        str = arg.substring(arg.indexOf("OK")+2).trim();
+                        setListeSolde(str);
+                    }
                     break;
                 case "RETRAIT" :
                     arg = evenement.getArgument();
-                    JOptionPane.showMessageDialog(panneauPrincipal,"RETRAIT "+arg);
+                    if (arg.trim().startsWith("NO")) {
+                        JOptionPane.showMessageDialog(panneauPrincipal,"Erreur de retrait");
+                    }
+                    else {
+                        str = arg.substring(arg.indexOf("OK")+2).trim();
+                        setListeSolde(str);
+                    }
                     break;
                 case "FACTURE" :
                     arg = evenement.getArgument();
-                    JOptionPane.showMessageDialog(panneauPrincipal,"FACTURE" + arg);
+                    if (arg.trim().startsWith("NO")) {
+                        JOptionPane.showMessageDialog(panneauPrincipal,"Erreur de paiement");
+                    } else {
+                        JOptionPane.showMessageDialog(panneauPrincipal, "Le paiement est effectué");
+                        str = arg.substring(arg.indexOf("OK")+2).trim();
+                        setListeSolde(str);
+                    }
                     break;
                 case "TRANSFER" :
                     arg = evenement.getArgument();
-                    JOptionPane.showMessageDialog(panneauPrincipal,"TRANSFER " + arg);
+                    if (arg.trim().startsWith("NO")) {
+                        JOptionPane.showMessageDialog(panneauPrincipal,"Erreur de transfer");
+                    } else {
+                        JOptionPane.showMessageDialog(panneauPrincipal, "Le transfert est effectué");
+                        str = arg.substring(arg.indexOf("OK")+2).trim();
+                        setListeSolde(str);
+                        System.out.println(str);
+                    }
                     break;
                 /******************* TRAITEMENT PAR DÉFAUT *******************/
                 default:
@@ -112,4 +155,46 @@ public class GestionnaireEvenementClient2 implements GestionnaireEvenement {
             }
         }
     }
+
+    private void gererHistorique(String[] liste) {
+
+        boolean valeur = false;
+
+        while (!valeur) {
+            PanneauHistorique panneauHist = new PanneauHistorique(liste);
+
+            int reponse = JOptionPane.showConfirmDialog(
+                    null,
+                    panneauHist,
+                    "Historique",
+                    JOptionPane.CLOSED_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (reponse == JOptionPane.CLOSED_OPTION) {
+                valeur = true;
+            }
+
+            if (reponse == JOptionPane.OK_OPTION) {
+                valeur = true;
+            }
+        }
+    }
+
+    private void setListeSolde(String solde) {
+        JList<String> liste = panneauPrincipal.getListeNumeroCompte();
+        int index = Math.abs(liste.getSelectedIndex());
+        String[] tableauString = new String[liste.getModel().getSize()];
+
+        for (int i = 0; i < liste.getModel().getSize(); i++) {
+            tableauString[i] = liste.getModel().getElementAt(i);
+        }
+        tableauString[index] = tableauString[index].substring(0, tableauString[index].indexOf("]") + 1) + " " + solde;
+        panneauPrincipal.getNumerosComptes().clear();
+        for (String temp : tableauString) {
+            panneauPrincipal.getNumerosComptes().addElement(temp);
+        }
+
+    }
+
 }

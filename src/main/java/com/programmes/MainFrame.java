@@ -41,6 +41,7 @@ public class MainFrame extends JFrame implements Runnable, Observateur {
         //Configuration de la fenêtre
         this.setSize(1000,600);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addFermeture();
     }
 
     private void initialiserComposants() {
@@ -107,4 +108,24 @@ public class MainFrame extends JFrame implements Runnable, Observateur {
             }
         }
     }
+
+    private void addFermeture() {
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(
+                        MainFrame.this,
+                        "Êtes-vous sûr de vouloir quitter ?",
+                        "Confirmation de fermeture",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                if (option == JOptionPane.YES_OPTION) {
+                    if (client.isConnecte()){
+                        client.deconnecter();
+                    }
+                    System.exit(0);
+                }
+            }
+        });
+    }
+
 }
